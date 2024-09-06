@@ -11,3 +11,19 @@ def loadimages():
     pieces = ['bB', 'bK', 'bN', 'bp', 'bQ', 'bR', 'wB', 'wK', 'wN', 'wp', 'wQ', 'wR']
     for piece in pieces:
         IMAGES[piece] = p.image.load("my_chess/images/" + piece + ".png")
+
+def main():
+    p.init()
+    screen = p.display.set_mode((WIDTH, HEIGHT)) 
+    clock = p.time.Clock()
+    screen.fill(p.Color("white"))
+    gs = ChessEngine.gamestate()
+    validMoves = gs.getValidMoves()
+    moveMade = False
+    loadimages()
+    running = True
+    sqSelected = ()
+    playerClicks = []
+        
+        
+        
