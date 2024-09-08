@@ -13,17 +13,37 @@ def loadimages():
         IMAGES[piece] = p.image.load("my_chess/images/" + piece + ".png")
 
 def main():
+    """
+    Main driver for the chess game. Handles user input and game state updates.
+    """
     p.init()
-    screen = p.display.set_mode((WIDTH, HEIGHT)) 
+    screen = p.display.set_mode((WIDTH, HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
-    gs = ChessEngine.gamestate()
+    gs = ChessEngine.gamestate()  # Updated to match ChessEngine naming convention
     validMoves = gs.getValidMoves()
-    moveMade = False
-    loadimages()
+    moveMade = False  # Flag for when a move is made
+    loadImages()  # Load images once at the beginning
     running = True
-    sqSelected = ()
-    playerClicks = []
-        
+    sqSelected = ()  # No square selected initially
+    playerClicks = []  # Keep track of player clicks (two tuples for two clicks)
+
+    while running:
+        for e in p.event.get():
+            if e.type == p.QUIT:
+                running = False
+
+            # Mouse handling
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos()  # Get mouse click location
+                col = location[0] // SQ_SIZE
+                row = location[1] // SQ_SIZE
+
+                if sqSelected == (row, col):  # Deselect if clicked same square
+                    sqSelected = ()
+                    playerClicks = []
+                else:
+                    sqSelected = (row, col)
+                    playerClicks.append(sqSelected)  # Add the square to the clicks list
         
         
