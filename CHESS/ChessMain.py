@@ -45,5 +45,18 @@ def main():
                 else:
                     sqSelected = (row, col)
                     playerClicks.append(sqSelected)  # Add the square to the clicks list
+                if len(playerClicks) == 2:  # After two clicks
+                        move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                        print(f"Attempting move: {move.getChessnotation()}")
+                        for i in range(len(validMoves)):
+                            if move == validMoves[i]:
+                                gs.makeMoves(validMoves[i])
+                                moveMade = True
+                                animate = True
+                                sqSelected = ()  # Reset user clicks
+                                playerClicks = []
+                            if not moveMade:
+                                playerClicks = [sqSelected]  # Re-select if invalid move
+     
         
         
