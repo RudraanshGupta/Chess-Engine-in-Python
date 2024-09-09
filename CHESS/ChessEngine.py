@@ -54,33 +54,43 @@ class gamestate():
             if move.pieceMoved[1]== 'p' and abs(move.startRow- move.endRow) == 2:
                 self.enpassantPossible =()  
 
-       def getValidMoves(self):
-            for log in self.castleRightsLogs:
-                print(log.wks, log.wqs, log.bks, log.bqs, end =",")
-            print()    
-            tempEnpassantPossible = self.enpassantPossible
-            tempCastleRights = CastleRights(self.currentCastelingrights.wks, self.currentCastelingrights.bks,
-                                            self.currentCastelingrights.wqs, self.currentCastelingrights.bqs)
-            moves=self.getAllPossibleMoves()
-            if self.whitetomove:
-                self.getCastleMoves(self.whiteKingLocation[0],self.whiteKingLocation[1],moves)
+    def getValidMoves(self):
+        for log in self.castleRightsLogs:
+            print(log.wks, log.wqs, log.bks, log.bqs, end =",")
+        print()    
+        tempEnpassantPossible = self.enpassantPossible
+        tempCastleRights = CastleRights(self.currentCastelingrights.wks, self.currentCastelingrights.bks,
+                                        self.currentCastelingrights.wqs, self.currentCastelingrights.bqs)
+        moves=self.getAllPossibleMoves()
+        if self.whitetomove:
+            self.getCastleMoves(self.whiteKingLocation[0],self.whiteKingLocation[1],moves)
+        else:
+            self.getCastleMoves(self.blackKingLocation[0],self.blackKingLocation[1],moves)   
+        for i in range(len(moves)-1,-1,-1):
+            self.makeMoves(moves[i])
+            self.whitetomove = not self.whitetomove
+            if self.inCheck():
+                moves.remove(moves[i])
+            self.whitetomove = not self.whitetomove
+            self.undoMove()
+        if len(moves) == 0:
+            if self.inCheck():
+                self.checkMate = True
             else:
-                self.getCastleMoves(self.blackKingLocation[0],self.blackKingLocation[1],moves)   
-            for i in range(len(moves)-1,-1,-1):
-                self.makeMoves(moves[i])
-                self.whitetomove = not self.whitetomove
-                if self.inCheck():
-                    moves.remove(moves[i])
-                self.whitetomove = not self.whitetomove
-                self.undoMove()
-            if len(moves) == 0:
-                if self.inCheck():
-                    self.checkMate = True
-                else:
-                    self.staleMate = True
-            else:
-                self.checkMate = False
-                self.staleMate = False                  
-            self.enpassantPossible= tempEnpassantPossible
-            self.currentCastelingrights = tempCastleRights
-            return moves
+                self.staleMate = True
+        else:
+            self.checkMate = False
+            self.staleMate = False                  
+        self.enpassantPossible= tempEnpassantPossible
+        self.currentCastelingrights = tempCastleRights
+        return moves
+
+    def getAllPossibleMoves(self):
+        moves = []
+        for r in range(len(self.board)):
+            for c in range(len(self.board[r])):
+                turn = self.board[r][c][0] 
+                if (turn == 'w' and self.whitetomove) or (turn == 'b' and not self.whitetomove): 
+                    piece = self.board[r][c][1]
+                    self.moveFunctions[piece](r, c, moves)
+        return moves       
