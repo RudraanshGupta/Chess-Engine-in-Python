@@ -57,6 +57,19 @@ def main():
                                 playerClicks = []
                             if not moveMade:
                                 playerClicks = [sqSelected]  # Re-select if invalid move
+            # Key handling
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:  # Undo move on 'z' key press
+                    gs.undoMove()
+                    moveMade = True
+                    animate = False
+                if e.key == p.K_r: # Undo board on 'r' key press
+                    gs  = ChessEngine.Gamestate()
+                    validMoves = gs.validMoves()
+                    sqSelected = ()
+                    playerClicks = []
+                    moveMade = False
+                    animate = False     
      
         
         
