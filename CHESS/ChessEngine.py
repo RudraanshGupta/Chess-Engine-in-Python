@@ -93,4 +93,56 @@ class gamestate():
                 if (turn == 'w' and self.whitetomove) or (turn == 'b' and not self.whitetomove): 
                     piece = self.board[r][c][1]
                     self.moveFunctions[piece](r, c, moves)
-        return moves       
+        return moves  
+
+    def getPawnMoves(self, r, c, moves):
+        if self.whitetomove:
+            if self.board[r-1][c] == "--":
+                moves.append(Move((r, c), (r-1, c), self.board))
+                if r == 6 and self.board[r-2][c] == "--":
+                    moves.append(Move((r, c), (r-2, c), self.board))
+            if c-1 >= 0:
+                if self.board[r-1][c-1][0] == 'b':
+                    moves.append(Move((r, c), (r-1, c-1), self.board))
+                #elif (r-1,c-1) == self.enpassantPossible:
+                    #moves.append(Move((r,c), (r-1, c-1), self.board, enpassantPossible= True))    
+            if c+1 <= 7: 
+                if self.board[r-1][c+1][0] == 'b':
+                    moves.append(Move((r, c), (r-1, c+1), self.board))    
+                #elif (r-1,c+1) == self.enpassantPossible:
+                    #moves.append(Move((r,c), (r-1, c+1), self.board, enpassantPossible= True))
+        else:
+            if self.board[r+1][c] == "--":
+                    moves.append(Move((r, c), (r+1, c), self.board))
+                    if r == 1 and self.board[r+2][c] == "--":
+                        moves.append(Move((r, c), (r+2, c), self.board))
+            if c-1 >= 0:
+                    if self.board[r+1][c-1][0] == 'w':
+                        moves.append(Move((r, c), (r+1, c-1), self.board))
+                    #elif (r+1,c-1) == self.enpassantPossible:
+                        #moves.append(Move((r,c), (r+1, c-1), self.board, enpassantPossible= False))              
+            if c+1 <= 7:
+                    if self.board[r+1][c+1][0] == 'w':
+                        moves.append(Move((r, c), (r+1, c+1), self.board))           
+                    #elif (r+1,c+1) == self.enpassantPossible:
+                        #moves.append(Move((r,c), (r+1, c+1), self.board, enpassantPossible= False))     
+    
+    
+    def getRookMoves(self, r, c, moves): 
+        directions = ((-1, 0), (0, -1), (1, 0), (0, 1))
+        enemyColor = "b" if self.whitetomove else "w"   
+        for d in directions:
+            for i in range(1, 8):
+                endRow = r + d[0] * i
+                endCol = c + d[1] * i
+                if 0 <= endRow < 8 and 0 <= endCol < 8:
+                        endPiece = self.board[endRow][endCol]
+                        if endPiece == "--":
+                            moves.append(Move((r, c), (endRow, endCol), self.board))
+                        elif endPiece[0] == enemyColor:
+                            moves.append(Move((r, c), (endRow, endCol), self.board))
+                            break
+                        else:
+                            break
+                else:
+                    break
