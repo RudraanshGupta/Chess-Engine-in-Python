@@ -70,6 +70,22 @@ def main():
                     playerClicks = []
                     moveMade = False
                     animate = False     
+
+        if not gameOver and not humanTurn:
+            AIMove = chessAI.findBestMove(gs, validMoves)
+            if AIMove is None:
+                AIMove = chessAI.findRandomMove(validMoves)
+            gs.makeMoves(AIMove)
+            moveMade = True
+            animate = True
+        
+        # After a move is made
+        if moveMade:
+            if animate:
+                animateMove(gs.movelog[-1], screen,gs.board, clock)
+            validMoves = gs.getValidMoves()  # Recalculate valid moves
+            moveMade = False
+            animate = False    
      
         
         
