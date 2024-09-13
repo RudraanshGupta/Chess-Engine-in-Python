@@ -57,35 +57,66 @@ def main():
                                 playerClicks = []
                             if not moveMade:
                                 playerClicks = [sqSelected]  # Re-select if invalid move
+
             # Key handling
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:  # Undo move on 'z' key press
                     gs.undoMove()
+                    sqSelected = ()
+                    playerClicks = []
                     moveMade = True
                     animate = False
+                    gameOver = False
+                    if AIThinking:
+                        moveFinderProcess.terminate()
+                        AIThinking = False
+                    moveUndone = True   
                 if e.key == p.K_r: # Undo board on 'r' key press
                     gs  = ChessEngine.Gamestate()
                     validMoves = gs.validMoves()
                     sqSelected = ()
                     playerClicks = []
                     moveMade = False
-                    animate = False     
+                    animate = False
+                    gameOver = False  
+                    if AIThinking:
+                        moveFinderProcess.terminate()
+                        AIThinking = False   
+                    moveUndone = True   
 
-        if not gameOver and not humanTurn:
-            AIMove = chessAI.findBestMove(gs, validMoves)
-            if AIMove is None:
-                AIMove = chessAI.findRandomMove(validMoves)
-            gs.makeMoves(AIMove)
-            moveMade = True
-            animate = True
-        
+        if not gameOver and not humanTurn and not moveUndone:
+            if not AIThinking:
+                AIThinking= True
+                print("thinking....")
+                returnQueue = Queue()
+                moveFinderProcess = Process(target = chessAI.findBestMove, args= (gs, validMoves, returnQueue))
+                moveFinderProcess.start()
+            
+            if not moveFinderProcess.is_alive():
+                print("Done thinking") 
+                AIMove = returnQueue.get()   
+                AIMove = chessAI.findBestMove(gs, validMoves,returnQueue)
+                if AIMove is None:
+                    AIMove = chessAI.findRandomMove(validMoves)
+                gs.makeMoves(AIMove)
+                moveMade = True
+                animate = True
+                AIThinking = False
+            
         # After a move is made
         if moveMade:
             if animate:
                 animateMove(gs.movelog[-1], screen,gs.board, clock)
             validMoves = gs.getValidMoves()  # Recalculate valid moves
             moveMade = False
-            animate = False    
-     
-        
-        
+            animate = False
+            moveUndone = False
+
+
+        drawGameState(screen, gs,validMoves,sqSelected,moveLogFont)  # Redraw the game state on the screen
+        if gs.checkMate or gs.staleMate:
+            gameOver = True
+            drawEndGameText(screen,'Stalemate' if gs.staleMate else 'Black wins by Checkmate' if gs.whitetomove else 'Black wins by Checkmate')
+                     
+        clock.tick(MAX_FPS)
+        p.display.flip()
