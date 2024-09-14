@@ -120,3 +120,23 @@ def main():
                      
         clock.tick(MAX_FPS)
         p.display.flip()
+        
+def drawGameState(screen, gs,validMoves,sqSelected,moveLogFont):
+    """
+    Responsible for all the graphics within the current game state.
+    """
+    drawBoard(screen)  # Draw the squares on the board
+    highlightSquares(screen, gs,validMoves,sqSelected )
+    drawPieces(screen, gs.board)  # Draw the pieces on top of the squares
+    drawMoveLog(screen, gs, moveLogFont)
+
+def drawBoard(screen):
+    """
+    Draws the board with alternating colors (white and gray).
+    """
+    global colors
+    colors = [p.Color("white"), p.Color("gray")]
+    for r in range(DIMENTIONS):
+        for c in range(DIMENTIONS):
+            color = colors[((r + c) % 2)]  # Alternate colors
+            p.draw.rect(screen, color, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
