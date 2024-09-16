@@ -140,3 +140,26 @@ def drawBoard(screen):
         for c in range(DIMENTIONS):
             color = colors[((r + c) % 2)]  # Alternate colors
             p.draw.rect(screen, color, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+def highlightSquares(screen,gs,validMoves,sqSelecred):
+      if sqSelecred !=():
+        r,c = sqSelecred
+        if gs.board[r][c][0] == ('w' if gs.whitetomove else 'b'):
+            s= p.Surface((SQ_SIZE,SQ_SIZE))
+            s.set_alpha(100)
+            s.fill(p.Color('blue'))
+            screen.blit(s,(c*SQ_SIZE, r*SQ_SIZE))
+            s.fill(p.Color('yellow'))
+            for move in validMoves:
+                if move.startRow == r and move.startCol == c:
+                    screen.blit(s,(move.endCol*SQ_SIZE, move.endRow*SQ_SIZE))  
+
+def drawPieces(screen, board):
+    """
+    Draws the pieces on the board using the current game state's board array.
+    """
+    for r in range(DIMENTIONS):
+        for c in range(DIMENTIONS):
+            piece = board[r][c]
+            if piece != "--":  # If not an empty square
+                screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
