@@ -1,51 +1,68 @@
 import pygame as p
-import ChessEngine
+import ChessEngine, chessAI
+from multiprocessing import Process, Queue
 
-WIDTH = HEIGHT = 512
-DIMENTIONS = 8
-SQ_SIZE = HEIGHT // DIMENTIONS
+BOARD_WIDTH = BOARD_HEIGHT = 512
+MOVE_LOG_PANEL_WIDTH = 250
+MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
+DIMENTIONS = 8  # 8x8 board
+SQ_SIZE = BOARD_HEIGHT // DIMENTIONS
 MAX_FPS = 15
 IMAGES = {}
 
-def loadimages():
+def loadImages():
+    """
+    Initializes a dictionary of images for each piece and scales them to fit the board squares.
+    """
     pieces = ['bB', 'bK', 'bN', 'bp', 'bQ', 'bR', 'wB', 'wK', 'wN', 'wp', 'wQ', 'wR']
     for piece in pieces:
-        IMAGES[piece] = p.image.load("my_chess/images/" + piece + ".png")
+        IMAGES[piece] = p.transform.scale(p.image.load(f"my_chess/images/{piece}.png"), (SQ_SIZE, SQ_SIZE))
 
 def main():
     """
     Main driver for the chess game. Handles user input and game state updates.
     """
     p.init()
-    screen = p.display.set_mode((WIDTH, HEIGHT))
+    screen = p.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH , BOARD_HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
-    gs = ChessEngine.gamestate()  # Updated to match ChessEngine naming convention
+    moveLogFont = p.font.SysFont("Arial",14,False,False)
+    gs = ChessEngine.Gamestate()  # Updated to match ChessEngine naming convention
     validMoves = gs.getValidMoves()
     moveMade = False  # Flag for when a move is made
+    animate = False
     loadImages()  # Load images once at the beginning
     running = True
     sqSelected = ()  # No square selected initially
     playerClicks = []  # Keep track of player clicks (two tuples for two clicks)
-
+    gameOver = False
+    playerOne = True
+    playerTwo = False
+    AIThinking= False
+    moveFinderProcess =None
+    moveUndone = False
+    
     while running:
+        humanTurn = (gs.whitetomove and playerOne) or (not gs.whitetomove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
 
             # Mouse handling
             elif e.type == p.MOUSEBUTTONDOWN:
-                location = p.mouse.get_pos()  # Get mouse click location
-                col = location[0] // SQ_SIZE
-                row = location[1] // SQ_SIZE
+                if not gameOver:
+                    location = p.mouse.get_pos()  # Get mouse click location
+                    col = location[0] // SQ_SIZE
+                    row = location[1] // SQ_SIZE
 
-                if sqSelected == (row, col):  # Deselect if clicked same square
-                    sqSelected = ()
-                    playerClicks = []
-                else:
-                    sqSelected = (row, col)
-                    playerClicks.append(sqSelected)  # Add the square to the clicks list
-                if len(playerClicks) == 2:  # After two clicks
+                    if sqSelected == (row, col) or col >= 8:  # Deselect if clicked same square
+                        sqSelected = ()
+                        playerClicks = []
+                    else:
+                        sqSelected = (row, col)
+                        playerClicks.append(sqSelected)  # Add the square to the clicks list
+
+                    if len(playerClicks) == 2 and humanTurn:  # After two clicks
                         move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                         print(f"Attempting move: {move.getChessnotation()}")
                         for i in range(len(validMoves)):
@@ -163,3 +180,27 @@ def drawPieces(screen, board):
             piece = board[r][c]
             if piece != "--":  # If not an empty square
                 screen.blit(IMAGES[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+def drawMoveLog(screen, gs,font):
+    moveLogRect = p.Rect(BOARD_WIDTH,0 , MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
+    p.draw.rect(screen, p.Color("black"), moveLogRect)
+    moveLog = gs.movelog
+    moveTexts = []
+    for i in range(0, len(moveLog),2):
+        moveString = str(i//2 + 1) + ". " + str(moveLog[i])+ " "
+        if i+1 < len(moveLog):
+            moveString += str(moveLog[i+1]) + " "
+        moveTexts.append(moveString)  
+    movesPerRow = 3      
+    padding  = 5
+    lineSpacing = 2
+    textY = padding
+    for i in range(0,len(moveTexts), movesPerRow):
+        text = ""
+        for j in range(movesPerRow):
+            if i+j < len(moveTexts):
+                text += moveTexts[i+j]
+        textObject = font.render(text,True,p.Color('white')) 
+        textLocation = moveLogRect.move(padding,textY)
+        screen.blit(textObject,textLocation)   
+        textY += textObject.get_height() + lineSpacing
