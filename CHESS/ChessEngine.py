@@ -289,3 +289,21 @@ class Gamestate():
                 endPiece = self.board[endRow][endCol]
                 if endPiece[0] != allyColor:
                     moves.append(Move((r, c), (endRow, endCol), self.board))
+        
+    def getCastleMoves(self,r,c,moves):
+        if self.squareUnderAttack(r,c):
+            return  
+        if (self.whitetomove and self.currentCastelingrights.wks) or (not self.whitetomove and self.currentCastelingrights.bks):
+            self.getkingsideCastleMoves(r,c,moves)
+        if (self.whitetomove and self.currentCastelingrights.wqs) or (not self.whitetomove and self.currentCastelingrights.bqs):
+            self.getQueensideCastleMoves(r,c,moves)
+    
+    def getkingsideCastleMoves(self,r,c,moves):
+        if self.board[r][c+1] == '--' and self.board[r][c+2] == '--':
+            if not self.squareUnderAttack(r, c+1) and not self.squareUnderAttack(r,c+2):
+                moves.append(Move((r,c),(r,c+2),self.board))#,isCastleMoves=True))  
+    
+    def getQueensideCastleMoves(self,r,c,moves):
+        if self.board[r][c-1] == '--' and self.board[r][c-3] == '--' and self.board[r][c-3]=='--':
+            if not self.squareUnderAttack(r, c-1) and not self.squareUnderAttack(r,c-2):
+                moves.append(Move((r,c),(r,c-2),self.board))#isCastleMoves=True))
