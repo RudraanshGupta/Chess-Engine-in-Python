@@ -229,3 +229,14 @@ def animateMove(move,screen,board,clock):
         screen.blit(IMAGES[move.pieceMoved], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
         clock.tick(60)
+        
+def drawEndGameText(screen, text):
+    font = p.font.SysFont("Helvetica",32,True,False)
+    textObject = font.render(text,0,p.Color('Gray')) 
+    textLocation = p.Rect(0,0,  BOARD_WIDTH, BOARD_HEIGHT).move(BOARD_WIDTH/2 - textObject.get_width()/2, BOARD_HEIGHT/2 - textObject.get_height()/2)   
+    screen.blit(textObject,textLocation)   
+    textObject = font.render(text,0,p.Color("Black"))
+    screen.blit(textObject, textLocation.move(2,2))    
+
+if __name__ == "__main__":
+    main()
