@@ -307,3 +307,20 @@ class Gamestate():
         if self.board[r][c-1] == '--' and self.board[r][c-3] == '--' and self.board[r][c-3]=='--':
             if not self.squareUnderAttack(r, c-1) and not self.squareUnderAttack(r,c-2):
                 moves.append(Move((r,c),(r,c-2),self.board))#isCastleMoves=True))
+                                                        
+class CastleRights():
+    def __init__(self, wks, bks,wqs, bqs):
+        self.wks = wks
+        self.bks = bks
+        self.wqs = wqs
+        self.bqs = bqs
+
+class Move():
+    # maps keys to values
+    # keys: value
+    ranksToRows = {"1":7,"2":6,"3":5,"4":4,
+                   "5":3,"6":2,"7":1,"8":0}
+    rowsToRanks=  {v:k for k, v in ranksToRows.items()}
+    filesToCols=  {"a":0,"b":1,"c":2,"d":3,
+                   "e":4,"f":5,"g":6,"h":7}
+    colstoFiles=  {v:k for k, v in filesToCols.items()}
