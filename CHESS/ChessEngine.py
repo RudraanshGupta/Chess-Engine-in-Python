@@ -324,3 +324,23 @@ class Move():
     filesToCols=  {"a":0,"b":1,"c":2,"d":3,
                    "e":4,"f":5,"g":6,"h":7}
     colstoFiles=  {v:k for k, v in filesToCols.items()}
+    
+    
+    def __init__(self, startSq, endSq, board, isEnpassantMove=False, isCastleMove=False):
+        # Unpack start and end squares
+        self.startRow = startSq[0]
+        self.startCol = startSq[1]
+        self.endRow = endSq[0]
+        self.endCol = endSq[1]
+        
+        # Fetching the pieces moved and captured
+        self.pieceMoved = board[self.startRow][self.startCol]
+        self.pieceCaptured = board[self.endRow][self.endCol]
+        
+        # Pawn promotion
+        self.isPawnPromotion = (self.pieceMoved == 'wp' and self.endRow == 0) or (self.pieceMoved == 'bp' and self.endRow == 7)
+        
+        # En passant move
+        self.isEnpassantMove = isEnpassantMove
+        if self.isEnpassantMove:
+            self.pieceCaptured = 'wp' if self.pieceMoved == 'bp' else 'bp'
