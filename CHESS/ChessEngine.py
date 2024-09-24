@@ -344,3 +344,9 @@ class Move():
         self.isEnpassantMove = isEnpassantMove
         if self.isEnpassantMove:
             self.pieceCaptured = 'wp' if self.pieceMoved == 'bp' else 'bp'
+        
+        # Castling
+        self.isCastleMove = isCastleMove
+        self.iscapture = self.pieceCaptured == '--'
+        # Unique move ID for hashing
+        self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
