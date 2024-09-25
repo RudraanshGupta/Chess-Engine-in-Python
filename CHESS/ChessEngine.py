@@ -350,3 +350,16 @@ class Move():
         self.iscapture = self.pieceCaptured == '--'
         # Unique move ID for hashing
         self.moveID = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
+        
+   
+   
+    def __eq__(self, other):
+        if isinstance(other,Move):
+            return self.moveID == other.moveID
+        return False  
+    
+    def getChessnotation(self):
+        return self.getRankFile(self.startRow,self.startCol) + self.getRankFile(self.endRow,self.endCol)
+    
+    def getRankFile(self,r,c):
+        return self.colstoFiles[c] + self.rowsToRanks[r]
