@@ -363,3 +363,20 @@ class Move():
     
     def getRankFile(self,r,c):
         return self.colstoFiles[c] + self.rowsToRanks[r]
+    
+    def __str__(self):
+        if self.isCastleMove:
+            return "O-O" if self.endCol == 6 else "O-O-O"
+        
+        endSquare = self.getRankFile(self.endRow, self.endCol)
+        if self.pieceMoved[1] =='p':
+            if self.iscapture:
+                return self.colstoFiles[self.startCol] + "x" + endSquare
+            else:
+                return endSquare
+            
+        moveString = self.pieceMoved[1]
+        if self.iscapture:
+            moveString+= 'x'
+        return moveString + endSquare        
+           
