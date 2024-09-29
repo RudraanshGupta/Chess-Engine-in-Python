@@ -62,3 +62,37 @@ DEPTH = 4
 
 def findRandomMove(validmoves):
     return validmoves [random.randint(0, len(validmoves)-1)]
+def findBestMoveMinMaxNoRecursion(gs, validmoves):
+    """ Returns the best move by evaluating the material score for all valid moves """
+    turnMultiplier = 1 if gs.whitetomove else -1
+    opponentMinMaxScore = CHECKMATE  # Initially set to a very low value
+    bestPlayerMove = None
+    random.shuffle(validmoves)
+    for playerMove in validmoves:
+        gs.makeMoves(playerMove)
+        opponentsMove = gs.getValidMoves()
+        if gs.staleMate:
+            opponentMaxScore = STALEMATE
+        elif gs.checkMate:
+            opponentMaxScore = -CHECKMATE
+        else:
+            opponentMaxScore = -CHECKMATE
+            for opponentsMove in opponentsMove:
+                gs.makeMove(opponentsMove)
+                gs.getvalidMoves()
+            # If we find a better move, update maxScore and bestMove
+                if gs.checkMate:
+                    score = CHECKMATE
+                elif gs.staleMate:
+                    score = STALEMATE
+                else:
+                    score = -turnMultiplier * scoreMaterial(gs.board) 
+                if score> opponentMaxScore:
+                    opponentMaxScore = score           
+            gs.undoMove()
+        if opponentMaxScore < opponentMinMaxScore:
+            opponentMinMaxScore = opponentMaxScore 
+            bestPlayerMove = playerMove
+        gs.undoMove()  # Undo the move and evaluate the next one
+    return bestPlayerMove
+
