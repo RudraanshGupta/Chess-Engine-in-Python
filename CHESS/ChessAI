@@ -96,3 +96,44 @@ def findBestMoveMinMaxNoRecursion(gs, validmoves):
         gs.undoMove()  # Undo the move and evaluate the next one
     return bestPlayerMove
 
+def findBestMove(gs,validMoves,returnQueue):
+    global nextMove,counter
+    nextMove = None
+    random.shuffle(validMoves)
+    counter = 0
+    #findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whitetomove else -1)
+    findMoveNegaMaxAlphaBeta(gs,validMoves,DEPTH, -CHECKMATE , CHECKMATE, 1 if gs.whitetomove else -1)
+    print(counter)
+    returnQueue.put(nextMove)
+
+def findMoveMinMax(gs, validMoves, depth, whitetomove):
+    global nextMove
+    if depth == 0:
+        return scoreMaterial(gs.board)
+    if whitetomove:
+        maxScore = -CHECKMATE
+        for move in validMoves:
+            gs.makeMoves(move)
+            nextMove = gs.getValidMoves()
+            score = findMoveMinMax(gs, nextMove, depth-1, False) 
+            if score > maxScore:
+                maxScore = score
+                if depth == DEPTH:
+                    nextMove = move
+            gs.undoMove()
+        return maxScore            
+                
+    else:
+        minScore = CHECKMATE 
+        for move in validMoves:
+            gs.makeMoves(move)
+            nextMove = gs.getValidMoves()
+            score = findMoveMinMax(gs, nextMove, depth-1, True) 
+            if score < minScore:
+                minScore = score
+                if depth == DEPTH:
+                    nextMove = move
+            gs.undoMove()
+        return minScore    
+    
+
