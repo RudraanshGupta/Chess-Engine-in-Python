@@ -134,6 +134,23 @@ def findMoveMinMax(gs, validMoves, depth, whitetomove):
                 if depth == DEPTH:
                     nextMove = move
             gs.undoMove()
-        return minScore    
+        return minScore     
+    
+def findMoveNegaMax(gs, validMoves, depth, turnMultiplier): 
+    global nextMove, counter
+    counter += 1
+    if depth == 0:
+        return turnMultiplier * scoreBoard(gs)
+    maxScore = -CHECKMATE 
+    for move in validMoves:
+        gs.makeMoves(move)
+        nextMoves = gs.getValidMoves()
+        score = -findMoveNegaMax(gs, nextMoves, depth-1, -turnMultiplier)
+        if score > maxScore:
+            maxScore = score
+            if depth == DEPTH:
+                nextMoves = move 
+        gs.undoMove()
+    return maxScore                
     
 
