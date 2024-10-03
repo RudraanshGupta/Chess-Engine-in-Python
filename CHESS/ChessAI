@@ -174,6 +174,32 @@ def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta,turnMultiplier):
             alpha = maxScore
         if alpha >= beta:
             break   
-    return maxScore                
+    return maxScore            
+                                               
+def scoreBoard(gs):
+    if gs.checkMate:
+        if gs.whitetomove:
+            return -CHECKMATE
+        else:
+            return CHECKMATE
+    elif gs.staleMate:
+        return STALEMATE    
+    
+    score = 0
+    for row in range(len(gs.board)):
+        for col in range (len(gs.board[row])):
+            square = gs.board[row][col]
+            if square != "--":  # Only evaluate non-empty squares
+                piecePositionScore =0
+                if square[1] != "K":
+                    if square[1] == "p":
+                        piecePositionScore = piecePositionScores[square][row][col]
+                    else:
+                        piecePositionScore = piecePositionScores[square[1]][row][col]
+                if square[0] == 'w':
+                    score += pieceScore[square[1].upper()] + piecePositionScore* .1 # Add white piece's value
+                else:
+                    score -= pieceScore[square[1].lower()] + piecePositionScore * .1 # Subtract black piece's value
+    return score                
     
 
