@@ -200,6 +200,17 @@ def scoreBoard(gs):
                     score += pieceScore[square[1].upper()] + piecePositionScore* .1 # Add white piece's value
                 else:
                     score -= pieceScore[square[1].lower()] + piecePositionScore * .1 # Subtract black piece's value
-    return score                
+    return score                         
+
+def scoreMaterial(board):
+    """ Evaluates the board based on material value """
+    score = 0
+    for row in board:
+        for square in row:
+            if square[0] == 'w':
+                score += pieceScore.get(square[1], 0)  # Default to 0 if not found
+            elif square[0] == 'b':
+                score -= pieceScore.get(square[1], 0)  # Default to 0 if not found
+    return score            
     
 
