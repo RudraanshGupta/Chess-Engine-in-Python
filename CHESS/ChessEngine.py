@@ -25,8 +25,7 @@ class Gamestate():
         self.currentCastelingrights = CastleRights(True, True, True,True)
         self.castleRightsLogs = [CastleRights(self.currentCastelingrights.wks, self.currentCastelingrights.bks,
                                               self.currentCastelingrights.wqs, self.currentCastelingrights.bqs)]
-        
-            
+               
     def makeMoves(self, move):
             self.board[move.startRow][move.startCol] = "--"    
             self.board[move.endRow][move.endCol] = move.pieceMoved
