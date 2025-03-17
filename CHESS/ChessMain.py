@@ -1,5 +1,7 @@
+from multiprocessing import Process
+from queue import Queue
 import pygame as p
-import ChessEngine, chessAI
+import ChessEngine, ChessAI
 
 BOARD_WIDTH = BOARD_HEIGHT = 512
 MOVE_LOG_PANEL_WIDTH = 250
@@ -105,15 +107,15 @@ def main():
                 AIThinking= True
                 print("thinking....")
                 returnQueue = Queue()
-                moveFinderProcess = Process(target = chessAI.findBestMove, args= (gs, validMoves, returnQueue))
+                moveFinderProcess = Process(target = ChessAI.findBestMove, args= (gs, validMoves, returnQueue))
                 moveFinderProcess.start()
             
             if not moveFinderProcess.is_alive():
                 print("Done thinking") 
                 AIMove = returnQueue.get()   
-                AIMove = chessAI.findBestMove(gs, validMoves,returnQueue)
+                AIMove = ChessAI.findBestMove(gs, validMoves,returnQueue)
                 if AIMove is None:
-                    AIMove = chessAI.findRandomMove(validMoves)
+                    AIMove = ChessAI.findRandomMove(validMoves)
                 gs.makeMoves(AIMove)
                 moveMade = True
                 animate = True
