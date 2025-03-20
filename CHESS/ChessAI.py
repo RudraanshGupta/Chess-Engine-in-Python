@@ -58,7 +58,7 @@ blackPawnsScore = [[0,0,0,0,0,0,0,0],
 piecePositionScores = {"N": knightsScore, "B": bishopScore, "Q": queenScore, "R": rookScore, "bp":blackPawnsScore, "wp": whitePawnsScore}
 CHECKMATE = 10000
 STALEMATE = 0
-DEPTH = 4
+DEPTH = 5
 
 def findRandomMove(validmoves):
     return validmoves [random.randint(0, len(validmoves)-1)]
@@ -96,15 +96,14 @@ def findBestMoveMinMaxNoRecursion(gs, validmoves):
         gs.undoMove()  # Undo the move and evaluate the next one
     return bestPlayerMove
 
-def findBestMove(gs,validMoves,returnQueue):
-    global nextMove,counter
+def findBestMove(gs, validMoves, returnQueue=None):
+    global nextMove, counter
     nextMove = None
-    random.shuffle(validMoves)
-    counter = 0
-    #findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whitetomove else -1)
-    findMoveNegaMaxAlphaBeta(gs,validMoves,DEPTH, -CHECKMATE , CHECKMATE, 1 if gs.whitetomove else -1)
-    print(counter)
-    returnQueue.put(nextMove)
+    counter = 0   # Reset counter
+    findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whitetomove else -1)
+    if returnQueue is not None:
+        returnQueue.put(nextMove)
+    return nextMove
 
 def findMoveMinMax(gs, validMoves, depth, whitetomove):
     global nextMove
