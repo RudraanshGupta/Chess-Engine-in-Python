@@ -8,23 +8,19 @@ from ChessEngine import Gamestate
 from ChessAI import findBestMove
 import time
 
-# Initialize the game state
 if "game_state" not in st.session_state:
     st.session_state.game_state = Gamestate()
     st.session_state.board = chess.Board()
     st.session_state.move_log = []
 
-# Function to render the chessboard as an image
 def render_board(board):
     """Renders the current chessboard as an SVG image and encodes it for Streamlit."""
     svg = chess.svg.board(board)
     return f'<img src="data:image/svg+xml;base64,{base64.b64encode(svg.encode()).decode()}"/>'
 
-# Streamlit UI
 st.title("♟️ Chess Game with AI ♟️")
 st.markdown("Play against an AI chess engine built using Pygame and Streamlit.")
 
-# Display the chessboard
 st.markdown(render_board(st.session_state.board), unsafe_allow_html=True)
 
 # Input move
