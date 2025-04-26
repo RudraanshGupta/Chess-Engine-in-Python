@@ -23,7 +23,6 @@ st.markdown("Play against an AI chess engine built using Pygame and Streamlit.")
 
 st.markdown(render_board(st.session_state.board), unsafe_allow_html=True)
 
-# Input move
 user_move = st.text_input("Enter your move (e.g., e2e4):")
 
 if st.button("Make Move"):
@@ -33,7 +32,6 @@ if st.button("Make Move"):
             st.session_state.board.push(move)
             st.session_state.move_log.append(f"User: {user_move}")
 
-            # AI Move
             if not st.session_state.board.is_game_over():
                 time.sleep(1)  # Simulating AI thinking time
                 ai_move = findBestMove(st.session_state.game_state, st.session_state.game_state.getValidMoves(), None)
@@ -47,12 +45,10 @@ if st.button("Make Move"):
     except Exception as e:
         st.error(f"Error: {str(e)}")
 
-# Display move log
 st.subheader("Move Log")
 for move in st.session_state.move_log:
     st.write(move)
 
-# Check Game Over Conditions
 if st.session_state.board.is_checkmate():
     st.success("Checkmate! Game over.")
 elif st.session_state.board.is_stalemate():
