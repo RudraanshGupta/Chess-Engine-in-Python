@@ -1,61 +1,76 @@
 import streamlit as st
-import chess
-import chess.svg
-import pygame as p
-import base64
-from io import BytesIO
 from ChessEngine import Gamestate
-from ChessAI import findBestMove
+from ChessAI import findBestMove, findRandomMove
+import chess
 import time
 
-if "game_state" not in st.session_state:
-    st.session_state.game_state = Gamestate()
-    st.session_state.board = chess.Board()
-    st.session_state.move_log = []
+# Unicode pieces mapping
+UNICODE_PIECES = {
+    'wp': '♙', 'wR': '♖', 'wN': '♘', 'wB': '♗', 'wQ': '♕', 'wK': '♔',
+    'bp': '♟', 'bR': '♜', 'bN': '♞', 'bB': '♝', 'bQ': '♛', 'bK': '♚',
+    '--': ' '
+}
 
-def render_board(board):
-    """Renders the current chessboard as an SVG image and encodes it for Streamlit."""
-    svg = chess.svg.board(board)
-    return f'<img src="data:image/svg+xml;base64,{base64.b64encode(svg.encode()).decode()}"/>'
+# Initialize game state
+if 'gs' not in st.session_state:
+    st.session_state.gs = Gamestate()
+    st.session_state.selected = None  # (row, col)
+    st.session_state.move_made = False
 
-st.title("♟️ Chess Game with AI ♟️")
-st.markdown("Play against an AI chess engine built using Pygame and Streamlit.")
+st.title("♟️ Chess Engine on Streamlit")
 
-st.markdown(render_board(st.session_state.board), unsafe_allow_html=True)
-
-# Input move
-user_move = st.text_input("Enter your move (e.g., e2e4):")
-
-if st.button("Make Move"):
-    try:
-        move = chess.Move.from_uci(user_move)
-        if move in st.session_state.board.legal_moves:
-            st.session_state.board.push(move)
-            st.session_state.move_log.append(f"User: {user_move}")
-
-            # AI Move
-            if not st.session_state.board.is_game_over():
-                time.sleep(1)  # Simulating AI thinking time
-                ai_move = findBestMove(st.session_state.game_state, st.session_state.game_state.getValidMoves(), None)
-                if ai_move:
-                    st.session_state.board.push(chess.Move.from_uci(ai_move))
-                    st.session_state.move_log.append(f"AI: {ai_move}")
-
+# Render board as an 8x8 grid of buttons
+for r in range(8):
+    cols = st.columns(8)
+    for c, col in enumerate(cols):
+        piece = st.session_state.gs.board[r][c]
+        label = UNICODE_PIECES[piece]
+        # highlight selected
+        if st.session_state.selected == (r, c):
+            styles = "background-color:lightblue"
         else:
-            st.error("Invalid move! Try again.")
+            styles = None
+        if col.button(label, key=f"{r}_{c}", help=f"{r},{c}"):
+            # handle click
+            if st.session_state.selected is None:
+                if piece != '--' and ((piece[0]=='w' and st.session_state.gs.whitetomove) or (piece[0]=='b' and not st.session_state.gs.whitetomove)):
+                    st.session_state.selected = (r, c)
+            else:
+                start = st.session_state.selected
+                end = (r, c)
+                move = None
+                # find matching move
+                for m in st.session_state.gs.getValidMoves():
+                    if m.startRow==start[0] and m.startCol==start[1] and m.endRow==end[0] and m.endCol==end[1]:
+                        move = m
+                        break
+                if move:
+                    st.session_state.gs.makeMoves(move)
+                    st.session_state.move_made = True
+                st.session_state.selected = None
+            st.experimental_rerun()
 
-    except Exception as e:
-        st.error(f"Error: {str(e)}")
+# After human move, let AI play
+if st.session_state.move_made:
+    with st.spinner("AI thinking..."):
+        time.sleep(0.5)
+        valid = st.session_state.gs.getValidMoves()
+        ai_move = findBestMove(st.session_state.gs, valid, None)
+        if ai_move is None:
+            ai_move = findRandomMove(valid)
+        st.session_state.gs.makeMoves(ai_move)
+        st.session_state.move_made = False
+    st.experimental_rerun()
 
-# Display move log
-st.subheader("Move Log")
-for move in st.session_state.move_log:
-    st.write(move)
-
-# Check Game Over Conditions
-if st.session_state.board.is_checkmate():
-    st.success("Checkmate! Game over.")
-elif st.session_state.board.is_stalemate():
-    st.warning("Stalemate! It's a draw.")
-elif st.session_state.board.is_insufficient_material():
-    st.warning("Draw due to insufficient material.")
+# Check endgame
+if st.session_state.gs.checkMate or st.session_state.gs.staleMate:
+    if st.session_state.gs.staleMate:
+        st.warning("Stalemate! It's a draw.")
+    else:
+        winner = 'Black' if st.session_state.gs.whitetomove else 'White'
+        st.success(f"Checkmate! {winner} wins.")
+    if st.button("Restart"):
+        st.session_state.gs = Gamestate()
+        st.session_state.selected = None
+        st.session_state.move_made = False
+        st.experimental_rerun()
