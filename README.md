@@ -11,13 +11,10 @@
 * [Instructions](#instructions)
 
 ## General info
-I have been playing chess since primary school and one day I had an idea to implement chess in Python. Then, I came across a tutorial by Eddie Sharick, who made a whole 16 episodes series covering the topic.
-This repository is a result of following his videos,  sometimes coming up with some improvements on my own. Hereby, I highly
-encourage you to visit his YouTube channel and check the whole series by yourself.
+I have been playing chess since primary school and one day I had an idea to implement chess in Python. It is a  fully functional Chess Engine built using Python and Pygame. This project implements the complete rules of chess, a graphical user interface (GUI), and an AI opponent capable of making strategic decisions using the Minimax algorithm with Alpha-Beta Pruning.
 
-[Eddie's YouTube channel](https://www.youtube.com/channel/UCaEohRz5bPHywGBwmR18Qww)
-
-[First episode of "Chess engine in Python"](https://www.youtube.com/watch?v=EnYui0e73Rs&ab_channel=EddieSharick)
+🚀 Overview
+This project was developed to understand the fundamentals of Computational Game Theory and Software Architecture. Unlike standard chess libraries, this engine handles all move generation, validation, and game state management (Check, Checkmate, Stalemate) through custom logic implemented in Python.
 
 ## Technologies
 * Python 3.7.8
