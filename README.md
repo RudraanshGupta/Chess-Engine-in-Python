@@ -36,3 +36,4 @@ This project was developed to understand the fundamentals of Computational Game 
 #### Sic:
 * Press `z` to undo a move.
 * Press `r` to reset the game.
+  
